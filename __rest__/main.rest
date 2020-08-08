@@ -1,0 +1,5 @@
+# REST Client 
+
+### GET some resource
+GET {{$dotenv BASEURL}} HTTP/1.1
+Accept: application/json
