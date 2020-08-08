@@ -1,4 +1,4 @@
-# Node Project Blueprint
+# NodeJS Project Blueprint
 
 Getting started using NodeJS with bundled package you need.
 
