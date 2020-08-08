@@ -1,0 +1,42 @@
+{
+  "name": "node-project-blueprint",
+  "version": "0.0.0",
+  "description": "NodeJS Project Blueprint Starter",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec babel-node ./src/index.js",
+    "start:server": "npm run build && node ./build/index.js",
+    "clean": "rm -rf build && mkdir build",
+    "build": "npm run clean && npm run build:source",
+    "build:source": "babel -d ./build ./src -s",
+    "lint": "eslint --ext .js",
+    "lint:fix": "eslint --fix --ext .js",
+    "test": "mocha --recursive \"__test__/**/*.test.js\" --require @babel/register",
+    "cover": "npm run cover:test && npm run cover:report",
+    "cover:test": "nyc --silent npm run test",
+    "cover:report": "nyc report --reporter=lcov --reporter=text",
+    "cover:serve": "concurrently \"serve -l 5577 coverage/lcov-report\" \"open-cli http://localhost:5577/\""
+  },
+  "dependencies": {
+    "signale": "^1.4.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.4",
+    "@babel/core": "^7.10.4",
+    "@babel/node": "^7.10.4",
+    "@babel/plugin-proposal-optional-chaining": "^7.11.0",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/register": "^7.10.4",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "chai": "^4.2.0",
+    "concurrently": "^5.3.0",
+    "eslint": "^7.6.0",
+    "mocha": "^8.0.1",
+    "nodemon": "^2.0.4",
+    "nyc": "^15.1.0",
+    "open-cli": "^6.0.1",
+    "serve": "^11.3.2"
+  },
+  "author": "Ryan Aunur Rassyid <ryandevstudio@gmail.com>",
+  "license": "MIT"
+}
