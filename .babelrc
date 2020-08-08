@@ -19,6 +19,7 @@
           "@test": "./__test__"
         }
       }
-    ]
+    ],
+    "@babel/plugin-syntax-optional-chaining"
   ]
 }
