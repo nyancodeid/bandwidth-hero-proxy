@@ -19,7 +19,7 @@ That's it. And to be clear this blueprint project is my workflow to getting done
 
 ## VS Code Extension
 
-This is my recomendation VS Code Extension to make this workflow better.
+This is my recomendation VS Code Extension to make my code workflow better.
 
 - REST Client
 - Prettier
