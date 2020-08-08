@@ -4,10 +4,10 @@ Getting started using NodeJS with bundled package you need.
 
 ## Build In
 
-- `Babel 7` as es6 transformer
-- `Mocha` as unit testing
-- `NYC` as code coverage report
-- `ESLint` as code linter
+- `Babel 7` as ES2020 Compiler
+- `Mocha` as Unit Testing
+- `NYC` as Code Coverage report
+- `ESLint` as Code Linter
 
 ## Using
 
