@@ -8,6 +8,7 @@ Getting started using NodeJS with bundled package you need.
 - `Mocha` as Unit Testing.
 - `NYC` as Code Coverage report.
 - `ESLint` as Code Linter.
+- `DotEnv` as env variable.
 - `babel-module-resolver` as folder aliases.
 
 ## Aliases
