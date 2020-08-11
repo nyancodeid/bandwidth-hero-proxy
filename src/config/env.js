@@ -1,6 +1,4 @@
-import dotenv from "dotenv";
-
-dotenv.config({ silent: true });
+import "dotenv/config";
 
 const Env = {
   /**
