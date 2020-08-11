@@ -2,6 +2,8 @@
 
 Getting started using NodeJS with bundled package you need.
 
+![Project CI](https://github.com/nyancodeid/node-project-blueprint/workflows/Project%20CI/badge.svg)
+
 ## Build In
 
 - `Babel 7` as ES2020 Compiler.
