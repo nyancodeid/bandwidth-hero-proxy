@@ -18,6 +18,7 @@
     "cover:serve": "concurrently \"serve -l 5577 coverage/lcov-report\" \"open-cli http://localhost:5577/\""
   },
   "dependencies": {
+    "dotenv": "^8.2.0",
     "signale": "^1.4.0"
   },
   "devDependencies": {
