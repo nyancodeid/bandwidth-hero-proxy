@@ -6,7 +6,7 @@ const Env = {
    * @param {string} name
    * @param {string} fallback
    */
-  use(name, fallback = "") {
+  use(name, fallback) {
     return process?.env?.[name] || fallback;
   },
 };

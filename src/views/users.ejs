@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+    integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous" />
+</head>
+
+<body>
+  <div class="container">
+    <h3>Table of Users</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Username</th>
+          <th scope="col">Image Processed</th>
+          <th scope="col">Total Byte</th>
+          <th scope="col">Total Byte Save</th>
+          <th scope="col">Percentage</th>
+          <th scope="col">Created At</th>
+          <th scope="col">Last Login At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(function(user, index){ %>
+        <tr>
+          <td><%= index+1 %></td>
+          <td><%= user.username %></td>
+          <td><%= user.stat.processed %></td>
+          <td><%= user.stat.byteTotal %></td>
+          <td><%= user.stat.saveByteTotal %></td>
+          <td><%= user.stat.percentage %>%</td>
+          <td class="update-time" data-date="<%= user.createdAt %>">
+            <%= user.createdAt %>
+          </td>
+          <td class="update-time" data-date="<%= user.lastLoginAt %>">
+            <%= user.lastLoginAt %>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+    integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous">
+  </script>
+
+  <script>
+    var elements = document.querySelectorAll(".update-time");
+
+    elements.forEach(function (element) {
+      var date = new Date(element.getAttribute("data-date"));
+
+      element.innerHTML = (date.toLocaleDateString() + " " + date.toLocaleTimeString());
+    })
+  </script>
+</body>
+
+</html>

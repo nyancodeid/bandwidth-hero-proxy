@@ -1,5 +1,17 @@
 # REST Client 
 
-### GET some resource
-GET {{$dotenv BASEURL}} HTTP/1.1
-Accept: application/json
+### Get all users
+GET {{$dotenv BASEURL}}/admin/users HTTP/1.1
+Accept: text/html
+Authorization: Basic {{$dotenv APP_KEY}}
+
+### Create new user
+POST {{$dotenv BASEURL}}/admin/user HTTP/1.1
+Content-Type: application/json
+Authorization: Basic {{$dotenv APP_KEY}}
+
+{
+  "username": "nyancodeid",
+  "email": "nyancodeid@gmail.com",
+  "password": "nyancodeid"
+}
