@@ -1,37 +1,41 @@
-# NodeJS Project Blueprint
+![Bandwidth Hero](https://raw.githubusercontent.com/ayastreb/bandwidth-hero/master/src/assets/logo.png)
 
-Getting started using NodeJS with bundled package you need.
+[![Build Status](https://travis-ci.org/ayastreb/bandwidth-hero.svg?branch=master)](https://travis-ci.org/ayastreb/bandwidth-hero)
+[![Code Climate](https://codeclimate.com/github/ayastreb/bandwidth-hero/badges/gpa.svg)](https://codeclimate.com/github/ayastreb/bandwidth-hero)
 
-![Project CI](https://github.com/nyancodeid/node-project-blueprint/workflows/Project%20CI/badge.svg)
+Bandwidth Hero is an open-source browser extension which reduces the amount of data consumed when
+you browse web pages by compressing all images on the page. It uses
+[data compression service](https://github.com/ayastreb/bandwidth-hero-proxy) to convert images to
+low-resolution [WebP](https://developers.google.com/speed/webp/) or JPEG images.
 
-## Build In
+## How It Works?
 
-- `Babel 7` as ES2020 Compiler.
-- `Mocha` as Unit Testing.
-- `NYC` as Code Coverage report.
-- `ESLint` as Code Linter.
-- `DotEnv` as env variable.
-- `babel-module-resolver` as folder aliases.
+![Workflow](https://raw.githubusercontent.com/ayastreb/bandwidth-hero/master/how-it-works.png)
 
-## Aliases
+1. When active, Bandwidth Hero intercepts all images loading requests
+2. It sends each image URL to the data compression service
+3. Compression service downloads the original image
+4. Once image is downloaded it is then converted to low-resolution
+   [WebP](https://developers.google.com/speed/webp/)/JPEG image.
+5. Compression service returns processed image to the browser
 
-| aliases  | folder        | description   |
-| -------- | ------------- | ------------- |
-| `@src/`  | `./src/`      | Source folder |
-| `@test/` | `./__test__/` | Test folder   |
+## Privacy Consideration
 
-## Using
+After installing the extension you need to setup data compression service.
 
-First you need clone this repository or download it.
+Please refer to [data compression service docs](https://github.com/ayastreb/bandwidth-hero-proxy)
+for detailed instructions on how to run your own service.
 
-Next, just run `npm install` on terminal to install all dependecy needed.
+Once you have your own instance running, click "Configure data compression service" button under
+"Compression settings" in the extension popup.
 
-That's it. And to be clear this blueprint project is my workflow to getting done with nodejs project. I build this repository is for my self to match with my coding workflow after all.
+## Installation
 
-## VS Code Extension
+[![Get Extension](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_340x96.png)](https://chrome.google.com/webstore/detail/bandwidth-hero/mmhippoadkhcflebgghophicgldbahdb?hl=en-US)
 
-This is my recomendation VS Code Extension to make my code workflow better.
+[![Get Firefox Addon](https://raw.githubusercontent.com/ayastreb/bandwidth-hero/master/ff-addon-badge.png)](https://addons.mozilla.org/en-US/firefox/addon/bandwidth-hero/)
 
-- REST Client
-- Prettier
-- ESLint
+## Authors
+
+- [ayastreb](https://github.com/ayastreb) (c) 2016 (Original) - [ayastreb/bandwidth-hero-proxy](https://github.com/ayastreb/bandwidth-hero-proxy)
+- [nyancodeid](https://github.com/nyancodeid) (c) 2020 - [nyancodeid/bandwidth-hero-proxy](https://github.com/nyancodeid/bandwidth-hero-proxy)
