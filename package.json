@@ -7,7 +7,7 @@
     "start": "nodemon --exec babel-node ./src/index.js",
     "start:server": "npm run build && node ./build/index.js",
     "clean": "rm -rf build && mkdir build",
-    "build": "npm run clean && npm run build:source",
+    "build": "npm run clean && npm run build:source && cp -r ./src/views ./build/views",
     "build:source": "babel -d ./build ./src -s",
     "lint": "eslint --ext .js",
     "lint:fix": "eslint --fix --ext .js",
