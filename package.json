@@ -1,6 +1,6 @@
 {
   "name": "node-project-blueprint",
-  "version": "0.0.0",
+  "version": "2.1.0",
   "description": "NodeJS Project Blueprint Starter",
   "main": "index.js",
   "scripts": {
