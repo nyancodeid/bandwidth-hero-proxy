@@ -32,11 +32,11 @@ export const init = () => {
 
 export const client = r;
 
-export const middleware = (req, res, next) => {
+export const middleware = async (req, res, next) => {
   try {
     req._connection = await init();
     next();
   } catch (error) {
     res.status(500).send("Internal Server Error");
   }
-}
+};
