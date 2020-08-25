@@ -1,58 +1,41 @@
 import bcrypt from "bcrypt";
 import prettyByte from "pretty-bytes";
+import md5 from "md5";
+
+import { signale } from "@src/config/signale.js";
+import { client as r } from "@src/config/rethink.js";
 
 const BCRYPT_SALT_ROUNDS = 10;
 
 export const getAllUser = async (req, res) => {
   try {
-    const results = await redis.scanAsync(["0", "MATCH", "user:*"]);
-    const [_, userKeys] = results;
+    const results = await r
+      .table("statistics")
+      .eqJoin("user_id", r.table("users"))
+      .zip()
+      .run(req._connection)
+      .then((res) => res.toArray());
 
-    const userDetails = userKeys.map(async (user) => {
-      const [_, userId] = user.split(":");
-
-      const userx = await redis.getAsync(user);
-      const stat = await redis.getAsync(`statistic:${userId}`);
-
+    const users = results.map((user) => {
       return {
-        user: userx,
-        stat,
-      };
-    });
-
-    const userValues = await Promise.all(userDetails);
-
-    const users = userValues.map((result) => {
-      const u = result.user.split(":");
-      u.splice(2, 1);
-
-      const [username, email, createdAt, lastLogin] = u;
-      const [
-        processed,
-        bypass,
-        compressed,
-        byteTotal,
-        saveByteTotal,
-      ] = result.stat.split(":");
-
-      return {
-        username,
-        email,
+        username: user.username,
+        email: user.email,
+        token: user.token,
         stat: {
-          processed,
-          bypass,
-          compressed,
-          byteTotal: prettyByte(parseInt(byteTotal)),
-          saveByteTotal: prettyByte(parseInt(saveByteTotal)),
+          processed: user.processed,
+          bypassed: user.bypassed,
+          compressed: user.compressed,
+          byteTotal: prettyByte(parseInt(user.byteTotal)),
+          byteSaveTotal: prettyByte(parseInt(user.byteSaveTotal)),
           percentage: (
-            ((parseInt(saveByteTotal) - parseInt(byteTotal)) /
-              parseInt(byteTotal)) *
+            ((parseInt(user.byteSaveTotal) - parseInt(user.byteTotal)) /
+              parseInt(user.byteTotal)) *
               100 +
             100
           ).toFixed(0),
         },
-        createdAt: new Date(parseInt(createdAt)),
-        lastLoginAt: new Date(parseInt(lastLogin)),
+        createdAt: user.createdAt,
+        lastLoginAt: user.lastLoginAt,
       };
     });
 
@@ -70,20 +53,44 @@ export const createUserView = (req, res) => {
 export const createUser = async (req, res) => {
   const { username, password, email } = req.body;
   const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
-  const createdAt = Date.now();
 
-  const user = await redis.getAsync(`user:${username}`);
+  const user = await r
+    .table("users")
+    .filter({
+      username,
+    })
+    .run(req._connection);
+  const token = md5(`${username}:${email}`).toString();
 
-  if (user) return res.send(`user "${username}" already available!`);
+  const availableUser = await user.toArray();
 
-  await redis.setAsync(
-    `user:${username}`,
-    `${username}:${email}:${passwordHash}:${createdAt}:${createdAt}`
-  );
-  await redis.setAsync(
-    `statistic:${username}`,
-    `0:0:0:0:0` // processed, bypassed, compressed, byte total, save byte total
-  );
+  if (availableUser.length > 0)
+    return res.send(`user "${username}" already available!`);
+
+  const userInput = await r
+    .table("users")
+    .insert({
+      username,
+      email,
+      password: passwordHash,
+      token,
+      createdAt: r.now(),
+      lastLoginAt: r.now(),
+    })
+    .run(req._connection);
+
+  await r
+    .table("statistics")
+    .insert({
+      user_id: userInput.generated_keys[0],
+      processed: 0,
+      bypassed: 0,
+      compressed: 0,
+      byteTotal: 0,
+      byteSaveTotal: 0,
+      updatedAt: r.now(),
+    })
+    .run(req._connection);
 
   return res.status(201).send("Created");
 };
