@@ -23,7 +23,7 @@ low-resolution [WebP](https://developers.google.com/speed/webp/) or JPEG images.
 
 After installing the extension you need to setup data compression service.
 
-Please refer to [data compression service docs](https://github.com/ayastreb/bandwidth-hero-proxy)
+Please refer to [data compression service docs](https://github.com/nyancodeid/bandwidth-hero-proxy)
 for detailed instructions on how to run your own service.
 
 Once you have your own instance running, click "Configure data compression service" button under
