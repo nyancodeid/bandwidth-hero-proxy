@@ -7,6 +7,6 @@ describe("Env Config Test", () => {
     expect(Env.use).to.be.a("function");
   });
   it("it will be get APP_KEY key", () => {
-    expect(Env.use("APP_KEY")).to.equal("example");
+    expect(Env.use("APP_KEY")).to.equal("admin:admin");
   });
 });
