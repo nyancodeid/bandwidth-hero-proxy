@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import bodyParser from "body-parser";
 
-import { init as initializeDatabase } from "@src/config/rethink.js";
+import { middleware as initializeDatabase } from "@src/config/rethink.js";
 
 import * as middleware from "@src/middleware/index.js";
 import * as compress from "@src/controllers/compress.js";
