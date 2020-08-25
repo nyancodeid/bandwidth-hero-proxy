@@ -1,40 +1,37 @@
 import auth from "basic-auth";
-import bcrypt from "bcrypt";
 
 import Env from "@src/config/env.js";
 import { accessDenied } from "@src/utils/index.js";
-import * as redis from "@src/config/redis.js";
+import { client as r } from "@src/config/rethink.js";
 
 export const authenticate = async (req, res, next) => {
-  const userId = req.params.userId;
+  const { username, token } = req.params;
 
-  if (!userId) return res.status(401).end("Access denied");
+  if (!username) return accessDenied(res, false);
 
-  const user = await redis.getAsync(`user:${userId}`);
+  const user = await r
+    .table("users")
+    .filter({
+      username,
+    })
+    .nth(0)
+    .default(null)
+    .run(req._connection);
 
-  if (!user) return res.status(401).end("Access denied");
+  if (!user) return accessDenied(res, false);
 
-  const [username, email, password, createdAt] = user.split(":");
-
-  const credentials = auth(req);
-
-  if (!credentials) {
-    return accessDenied(res);
+  if (username !== user.username || token !== user.token) {
+    return accessDenied(res, false);
   }
 
-  const isMatch = await bcrypt.compare(credentials.pass, password);
+  await r
+    .table("users")
+    .get(user.id)
+    .update({ lastLoginAt: r.now() })
+    .run(req._connection);
 
-  if (!isMatch || credentials.name !== username) {
-    return accessDenied(res);
-  }
-
-  await redis.setAsync(
-    `user:${userId}`,
-    [username, email, password, createdAt, Date.now()].join(":")
-  );
-
-  req.userId = userId;
-  req.user = { username, password };
+  req.userId = user.id;
+  req.user = user;
 
   next();
 };
@@ -49,12 +46,7 @@ export const adminAuthenticate = (req, res, next) => {
     credentials.name !== username ||
     credentials.pass !== password
   ) {
-    res.setHeader(
-      "WWW-Authenticate",
-      'Basic realm="Access to the staging site"'
-    );
-
-    return res.status(401).end("Access denied");
+    return accessDenied(res);
   }
 
   req.user = { username, password };
