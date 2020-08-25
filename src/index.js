@@ -30,14 +30,7 @@ app.set("view engine", "ejs");
 
 const csrfProtection = csrf({ cookie: true });
 
-app.use(async (req, res, next) => {
-  try {
-    req._connection = await initializeDatabase();
-    next();
-  } catch (error) {
-    res.status(500).send("Internal Server Error");
-  }
-});
+app.use(initializeDatabase);
 
 app.get(
   "/:userId",
