@@ -6,7 +6,7 @@
 import sharp from "sharp";
 import prettyByte from "pretty-bytes";
 import chalk from "chalk";
-import * as redis from "@src/config/redis.js";
+import { client as r } from "@src/config/rethink.js";
 
 import { signale } from "@src/config/signale.js";
 import Env from "@src/config/env.js";
@@ -93,12 +93,15 @@ export const compress = (req, res, buffer) => {
 
       const userId = req.userId;
 
-      incrementState({
-        userId,
-        byte: req.params.originSize,
-        saveByte: saved,
-        status: "compressed",
-      }).catch((error) => {
+      incrementState(
+        {
+          userId,
+          byte: req.params.originSize,
+          saveByte: saved,
+          status: "compressed",
+        },
+        req._connection
+      ).catch((error) => {
         signale.error(`[INC#ERR][STATE][${userId}] Error while update state`);
         signale.error(error);
       });
@@ -130,12 +133,15 @@ export const bypass = (req, res, buffer) => {
 
   const userId = req.userId;
 
-  incrementState({
-    userId,
-    byte: buffer.length,
-    saveByte: 0,
-    status: "bypass",
-  }).catch((error) => {
+  incrementState(
+    {
+      userId,
+      byte: buffer.length,
+      saveByte: 0,
+      status: "bypass",
+    },
+    req._connection
+  ).catch((error) => {
     signale.error(`[INC#ERR][STATE][${userId}] Error while update state`);
     signale.error(error);
   });
@@ -147,26 +153,33 @@ export const bypass = (req, res, buffer) => {
   res.end();
 };
 
-export const incrementState = async ({ userId, byte, saveByte, status }) => {
+export const incrementState = async (
+  { userId, byte, saveByte, status },
+  connection
+) => {
   try {
-    const stat = await redis.getAsync(`statistic:${userId}`);
-    const [
-      processed,
-      bypass,
-      compressed,
-      byteTotal,
-      saveByteTotal,
-    ] = stat.split(":");
+    const stat = await r
+      .table("statistics")
+      .filter({
+        user_id: userId,
+      })
+      .nth(0)
+      .default(null)
+      .run(connection);
 
-    const update = [
-      parseInt(processed) + 1,
-      status == "bypass" ? parseInt(bypass) + 1 : bypass,
-      status == "compressed" ? parseInt(compressed) + 1 : compressed,
-      parseInt(byteTotal) + parseInt(byte),
-      parseInt(saveByteTotal) + parseInt(saveByte),
-    ];
+    if (!stat) return;
 
-    await redis.setAsync(`statistic:${userId}`, update.join(":"));
+    const update = {
+      processed: stat.processed + 1,
+      bypassed: status == "bypass" ? stat.bypassed + 1 : stat.bypassed,
+      compressed:
+        status == "compressed" ? stat.compressed + 1 : stat.compressed,
+      byteTotal: stat.byteTotal + byte,
+      byteSaveTotal: stat.byteSaveTotal + saveByte,
+      updatedAt: r.now(),
+    };
+
+    await r.table("statistics").get(stat.id).update(update).run(connection);
   } catch (error) {
     signale.error(error);
   }
@@ -193,11 +206,12 @@ export const redirect = (req, res) => {
  * @function
  * @param {Response} res
  */
-export const accessDenied = (res) => {
-  res.setHeader(
-    "WWW-Authenticate",
-    `Basic realm="Bandwidth-Hero Compression Service"`
-  );
+export const accessDenied = (res, basic = true) => {
+  if (basic)
+    res.setHeader(
+      "WWW-Authenticate",
+      `Basic realm="Bandwidth-Hero Compression Service"`
+    );
 
   return res.status(401).end("Access denied");
 };
