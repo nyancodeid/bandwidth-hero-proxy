@@ -1,7 +1,5 @@
-import * as redis from "@src/config/redis.js";
 import bcrypt from "bcrypt";
 import prettyByte from "pretty-bytes";
-import signale from "signale";
 
 const BCRYPT_SALT_ROUNDS = 10;
 
