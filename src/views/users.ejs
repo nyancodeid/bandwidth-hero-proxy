@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <div class="container">
+  <div class="">
     <h3>Table of Users</h3>
     <table class="table table-striped">
       <thead>
@@ -29,11 +29,11 @@
         <% users.forEach(function(user, index){ %>
         <tr>
           <td><%= index+1 %></td>
-          <td><%= user.username %></td>
+          <td><%= user.username %><small class="d-block text-muted"><%= user.token %></small></td>
           <td><%= user.stat.processed %></td>
           <td><%= user.stat.byteTotal %></td>
-          <td><%= user.stat.saveByteTotal %></td>
-          <td><%= user.stat.percentage %>%</td>
+          <td><%= user.stat.byteSaveTotal %></td>
+          <td><%= user.stat.percentage | 0 %>%</td>
           <td class="update-time" data-date="<%= user.createdAt %>">
             <%= user.createdAt %>
           </td>

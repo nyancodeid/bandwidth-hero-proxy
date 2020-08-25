@@ -13,4 +13,5 @@ jobs:
         with:
           node-version: 12
       - run: npm ci
+      - run: cp .env.example .env
       - run: npm test

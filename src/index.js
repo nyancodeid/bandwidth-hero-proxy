@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import bodyParser from "body-parser";
 
+import { middleware as initializeDatabase } from "@src/config/rethink.js";
+
 import * as middleware from "@src/middleware/index.js";
 import * as compress from "@src/controllers/compress.js";
 import * as admin from "@src/controllers/admin.js";
@@ -28,8 +30,10 @@ app.set("view engine", "ejs");
 
 const csrfProtection = csrf({ cookie: true });
 
+app.use(initializeDatabase);
+
 app.get(
-  "/:userId",
+  "/s/:username/:token",
   [middleware.authenticate, middleware.params],
   compress.controller
 );

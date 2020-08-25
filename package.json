@@ -1,11 +1,12 @@
 {
   "name": "node-project-blueprint",
-  "version": "0.0.0",
+  "version": "2.1.0",
   "description": "NodeJS Project Blueprint Starter",
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exec babel-node ./src/index.js",
     "start:server": "npm run build && node ./build/index.js",
+    "migrate": "babel-node ./src/migrate.js",
     "clean": "rm -rf build && mkdir build",
     "build": "npm run clean && npm run build:source && cp -r ./src/views ./build/views",
     "build:source": "babel -d ./build ./src -s",
@@ -29,9 +30,10 @@
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "lodash": "^4.17.20",
+    "md5": "^2.3.0",
     "pretty-bytes": "^5.3.0",
-    "redis": "^3.0.2",
     "request": "^2.88.2",
+    "rethinkdb": "^2.4.2",
     "sharp": "^0.25.4",
     "signale": "^1.4.0"
   },
