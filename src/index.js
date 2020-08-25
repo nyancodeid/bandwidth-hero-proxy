@@ -33,7 +33,7 @@ const csrfProtection = csrf({ cookie: true });
 app.use(initializeDatabase);
 
 app.get(
-  "/:userId",
+  "/s/:username/:token",
   [middleware.authenticate, middleware.params],
   compress.controller
 );
