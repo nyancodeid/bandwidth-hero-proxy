@@ -5,9 +5,8 @@
  */
 
 import Env from "@src/config/env.js";
+import { client as r } from "@src/config/rethink.js";
 
-export const params = (req, res, next) => {
-  let url = req.query.url;
 /**
  * @middleware
  * @param {Request} req
@@ -20,15 +19,26 @@ export const params = async (req, res, next) => {
     url = url.join("&url=");
   }
 
-  // service indicator
-  if (!url) return res.end("bandwidth-hero-proxy");
+  /**
+   * When url goes empty or undefined it's marked as service-discover
+   * return string "bandwidth-hero-proxy".
+   */
+  if (!url) {
+    await r
+      .table("users")
+      .get(req.userId)
+      .update({ lastLoginAt: r.now() })
+      .run(req._connection);
+
+    return res.end("bandwidth-hero-proxy");
+  }
 
   url = url.replace(/http:\/\/1\.1\.\d\.\d\/bmi\/(https?:\/\/)?/i, "http://");
   req.params.url = url;
-  req.params.webp = !req.query.jpeg;
-  req.params.grayscale = req.query.bw != 0;
+  req.params.webp = !req.query?.jpeg;
+  req.params.grayscale = req.query?.bw != 0 || Env.use("APP_DEFAULT_BW", false);
   req.params.quality =
-    parseInt(req.query.l, 10) || Env.use("APP_DEFAULT_QUALITY", 40);
+    parseInt(req.query?.l, 10) || Env.use("APP_DEFAULT_QUALITY", 40);
 
   next();
 };
