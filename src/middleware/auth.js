@@ -36,12 +36,6 @@ export const authenticate = async (req, res, next) => {
     return accessDenied(res, false);
   }
 
-  await r
-    .table("users")
-    .get(user.id)
-    .update({ lastLoginAt: r.now() })
-    .run(req._connection);
-
   req.userId = user.id;
   req.user = user;
 
