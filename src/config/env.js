@@ -10,11 +10,7 @@ const Env = {
     const isBoolean = typeof fallback == "boolean";
     const envValue = process?.env?.[name] || fallback;
 
-    return isBoolean
-      ? parseInt(envValue) > 1
-        ? parseInt(envValue)
-        : Boolean(parseInt(envValue))
-      : envValue;
+    return isBoolean ? Boolean(envValue) : envValue;
   },
 };
 
