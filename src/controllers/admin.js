@@ -1,3 +1,8 @@
+/**
+ * @typedef {import('express').Request} Request
+ * @typedef {import('express').Response} Response
+ */
+
 import bcrypt from "bcrypt";
 import prettyByte from "pretty-bytes";
 import md5 from "md5";
@@ -7,6 +12,12 @@ import { client as r } from "@src/config/rethink.js";
 
 const BCRYPT_SALT_ROUNDS = 10;
 
+/**
+ * Get all registered users
+ * @controller
+ * @param {Request} req
+ * @param {Response} res
+ */
 export const getAllUser = async (req, res) => {
   try {
     const results = await r
@@ -46,10 +57,22 @@ export const getAllUser = async (req, res) => {
   }
 };
 
+/**
+ * Create user view form
+ * @controller
+ * @param {Request} req
+ * @param {Response} res
+ */
 export const createUserView = (req, res) => {
   res.render("create-user", { csrfToken: req.csrfToken() });
 };
 
+/**
+ * Create user POST Handler
+ * @controller
+ * @param {Request} req
+ * @param {Response} res
+ */
 export const createUser = async (req, res) => {
   const { username, password, email } = req.body;
   const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
