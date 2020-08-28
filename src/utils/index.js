@@ -38,9 +38,12 @@ export const copyHeaders = (source, res) => {
  */
 export const shouldCompress = (req) => {
   const { originType, originSize, webp } = req.params;
+  const whiteListCheck = WHITELIST_EXTENSION.filter((ext) => {
+    return originType.startsWith(ext) || originType.includes(ext);
+  });
 
   if (!originType.startsWith("image")) return false;
-  if (WHITELIST_EXTENSION.includes(originType)) return false;
+  if (whiteListCheck.length > 0) return false;
 
   if (originSize === 0) return false;
   if (webp && originSize < MIN_COMPRESS_LENGTH) return false;
