@@ -1,6 +1,7 @@
 /**
  * @typedef {import('express').Request} Request
  * @typedef {import('express').Response} Response
+ * @typedef {import('rethinkdb').Connection} RConnection
  */
 
 import sharp from "sharp";
@@ -153,6 +154,16 @@ export const bypass = (req, res, buffer) => {
   res.end();
 };
 
+/**
+ * @function
+ * @param {Object} data
+ * @param {string} data.userId
+ * @param {number} data.byte
+ * @param {number} data.saveByte
+ * @param {string} data.status
+ * @param {RConnection} connection
+ * @return {Promise}
+ */
 export const incrementState = async (
   { userId, byte, saveByte, status },
   connection
