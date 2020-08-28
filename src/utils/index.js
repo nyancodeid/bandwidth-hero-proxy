@@ -193,7 +193,7 @@ export const incrementState = async (
       updatedAt: r.now(),
     };
 
-    await r.table("statistics").get(stat.id).update(update).run(connection);
+    return r.table("statistics").get(stat.id).update(update).run(connection);
   } catch (error) {
     signale.error(error);
   }
