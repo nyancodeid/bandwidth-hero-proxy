@@ -1,9 +1,21 @@
+/**
+ * @typedef {import('express').Request} Request
+ * @typedef {import('express').Response} Response
+ * @typedef {import('express').NextFunction} NextFunction
+ */
+
 import auth from "basic-auth";
 
 import Env from "@src/config/env.js";
 import { accessDenied } from "@src/utils/index.js";
 import { client as r } from "@src/config/rethink.js";
 
+/**
+ * @middleware
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
 export const authenticate = async (req, res, next) => {
   const { username, token } = req.params;
 
@@ -36,6 +48,12 @@ export const authenticate = async (req, res, next) => {
   next();
 };
 
+/**
+ * @middleware
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
 export const adminAuthenticate = (req, res, next) => {
   const adminCredential = Env.use("APP_KEY");
   const [username, password] = adminCredential.split(":");
