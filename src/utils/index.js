@@ -88,7 +88,9 @@ export const compress = (req, res, buffer) => {
           : chalk.green(percentage.toFixed(1) + "%");
 
       signale.info(
-        `[${host.hostname}] Compression successfuly CHANGE:[${chalk.yellow(
+        `[${host.hostname}]${
+          req.params.grayscale ? "[BW]" : ""
+        } Compression successfuly CHANGE:[${chalk.yellow(
           prettyByte(req.params.originSize)
         )} -> ${chalk.yellow(prettyByte(info.size))}] SAVE:[${chalk.green(
           prettyByte(saved)
