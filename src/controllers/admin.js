@@ -102,10 +102,12 @@ export const createUser = async (req, res) => {
     })
     .run(req._connection);
 
+  const [userId] = userInput.generated_keys;
+
   await r
     .table("statistics")
     .insert({
-      user_id: userInput.generated_keys[0],
+      user_id: userId,
       processed: 0,
       bypassed: 0,
       compressed: 0,
