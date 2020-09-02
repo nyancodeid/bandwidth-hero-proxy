@@ -68,19 +68,37 @@ export const compress = (req, res, buffer) => {
   const format = req.params.webp ? "webp" : "jpeg";
   const host = new URL(req.params.url);
 
-  sharp(buffer)
-    .grayscale(req.params.grayscale)
-    .toFormat(format, {
-      quality: req.params.quality,
+  const options = {
+    webp: {
+      lossless: req.params.quality == 80,
+    },
+    jpeg: {
       progressive: true,
       optimizeScans: true,
+    },
+  };
+
+  const formatOption = Object.assign(
+    {
+      quality: req.params.quality,
+    },
+    options[format]
+  );
+
+  sharp(buffer)
+    .grayscale(req.params.grayscale)
+    .toFormat(format, formatOption)
+    .toBuffer({
+      resolveWithObject: true,
     })
-    .toBuffer((err, output, info) => {
-      if (err || !info || res.headersSent) return redirect(req, res);
+    .then(({ data: output, info }) => {
+      if (!info || res.headersSent) return redirect(req, res);
 
       const saved = req.params.originSize - info.size;
       const percentage =
         ((info.size - req.params.originSize) / req.params.originSize) * 100;
+
+      if (saved < 1) return bypass(req, res, buffer);
 
       const percentageText =
         percentage > 0
@@ -119,6 +137,9 @@ export const compress = (req, res, buffer) => {
       res.status(200);
       res.write(output);
       res.end();
+    })
+    .catch((error) => {
+      return redirect(req, res, buffer);
     });
 };
 
