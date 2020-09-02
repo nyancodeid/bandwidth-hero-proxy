@@ -4,6 +4,7 @@ import { signale } from "@src/config/signale.js";
 import path from "path";
 import express from "express";
 import csrf from "csurf";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import bodyParser from "body-parser";
@@ -20,6 +21,7 @@ const app = express();
 
 app.disable("x-powered-by");
 app.use(compression());
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
