@@ -41,7 +41,6 @@ export const controller = (req, res) => {
 
       copyHeaders(origin, res);
 
-      res.setHeader("content-encoding", "identity");
       req.params.originType = origin.headers["content-type"] || "";
       req.params.originSize = buffer.length;
 
