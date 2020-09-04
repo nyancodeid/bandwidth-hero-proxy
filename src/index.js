@@ -58,7 +58,11 @@ app.get(
   compress.controller
 );
 
-app.get("/admin/users", [middleware.adminAuthenticate], admin.getAllUser);
+app.get(
+  "/admin/users",
+  [middleware.adminAuthenticate, csrfProtection],
+  admin.getAllUser
+);
 app.get(
   "/admin/user",
   [middleware.adminAuthenticate, csrfProtection],
