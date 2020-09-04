@@ -8,3 +8,4 @@ services:
       - 8080:8080
     volumes:
       - /data:/data
+    command: rethinkdb --bind all --bind-http all --initial-password ${RETHINKDB_PASSWD}
