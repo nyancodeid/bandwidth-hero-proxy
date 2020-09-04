@@ -6,7 +6,6 @@ import express from "express";
 import csrf from "csurf";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
-// import compression from "compression";
 import bodyParser from "body-parser";
 
 import { middleware as initializeDatabase } from "@src/config/rethink.js";
@@ -21,7 +20,6 @@ const app = express();
 
 app.disable("x-powered-by");
 
-// app.use(compression());
 app.use(
   helmet({
     contentSecurityPolicy: {
