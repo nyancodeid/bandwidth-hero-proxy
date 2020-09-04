@@ -64,7 +64,8 @@ app.get(
   [middleware.adminAuthenticate, csrfProtection],
   admin.createUserView
 );
-app.post("/admin/user", [csrfProtection], admin.createUser);
+app.post("/admin/api/user", [csrfProtection], admin.createUser);
+app.post("/admin/api/token", [csrfProtection], admin.regenerateUserToken);
 
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
