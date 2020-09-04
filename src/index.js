@@ -22,7 +22,26 @@ const app = express();
 app.disable("x-powered-by");
 
 // app.use(compression());
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "unpkg.com",
+          "v5.getbootstrap.com",
+        ],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "unpkg.com",
+          "v5.getbootstrap.com",
+        ],
+      },
+    },
+  })
+);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
