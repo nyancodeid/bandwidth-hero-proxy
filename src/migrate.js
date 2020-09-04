@@ -39,7 +39,7 @@ async function main() {
     ]);
 
     logInfo(["MIGRATE"], "DB Table indexWait created");
-    signale.success("[MIGRATE] Operation successfuly");
+    signale.success("[MIGRATE] Operation successful");
   } catch (err) {
     signale.error("[MIGRATE] Could not run operations");
     signale.error(err);

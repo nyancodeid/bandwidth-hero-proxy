@@ -7,6 +7,7 @@ const options = {
   host: Env.use("RETHINKDB_HOST", "localhost"),
   port: Env.use("RETHINKDB_PORT", "28015"),
   db: Env.use("RETHINKDB_DB", "bandwidth-hero-db"),
+  password: Env.use("RETHINKDB_PASSWD", ""),
 };
 
 let connection = null;

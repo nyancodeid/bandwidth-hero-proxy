@@ -1,82 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="<%= csrfToken %>" />
 
-    <title>Document</title>
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
-      integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I"
-      crossorigin="anonymous"
-    />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="<%= csrfToken %>" />
 
-  <body>
-    <div class="container">
-      <h3>Create User</h3>
-      <form id="userForm">
-        <div class="mb-3">
-          <label for="input-username" class="form-label">Username</label>
-          <input
-            type="text"
-            class="form-control"
-            id="input-username"
-            name="username"
-          />
+  <title>Create User</title>
+  <link rel="stylesheet" href="https://v5.getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h3>Create User</h3>
+    <form id="userForm">
+      <div class="mb-3">
+        <label for="input-username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="input-username" name="username" />
+      </div>
+      <div class="mb-3">
+        <label for="input-email" class="form-label">Email address</label>
+        <input type="email" class="form-control" id="input-email" name="email" aria-describedby="emailHelp" />
+        <div id="emailHelp" class="form-text">
+          We'll never share your email with anyone else.
         </div>
-        <div class="mb-3">
-          <label for="input-email" class="form-label">Email address</label>
-          <input
-            type="email"
-            class="form-control"
-            id="input-email"
-            name="email"
-            aria-describedby="emailHelp"
-          />
-          <div id="emailHelp" class="form-text">
-            We'll never share your email with anyone else.
-          </div>
-        </div>
-        <div class="mb-3">
-          <label for="input-password" class="form-label">Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="input-password"
-            name="password"
-          />
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
-    </div>
+      </div>
+      <div class="mb-3">
+        <label for="input-password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="input-password" name="password" />
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
-      integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
-      crossorigin="anonymous"
-    ></script>
+  <script src="https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://v5.getbootstrap.com/docs/5.0/dist/js/bootstrap.min.js"></script>
 
-    <script>
-      document
-        .getElementById("userForm")
-        .addEventListener("submit", onFormSubmited, false);
+  <script>
+    document
+      .getElementById("userForm")
+      .addEventListener("submit", onFormSubmited, false);
 
-      function onFormSubmited(event) {
-        event.preventDefault();
+    function onFormSubmited(event) {
+      event.preventDefault();
 
-        var token = document
-          .querySelector('meta[name="csrf-token"]')
-          .getAttribute("content");
+      const token = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content");
 
-        fetch("/admin/user", {
+      fetch("/admin/api/user", {
           credentials: "same-origin",
           method: "POST",
           headers: {
@@ -89,14 +61,15 @@
             password: userForm.password.value,
           }),
         })
-          .then(function (result) {
-            return result.text();
-          })
-          .then(function (message) {
-            alert(message);
-          })
-          .catch(console.error);
-      }
-    </script>
-  </body>
+        .then(function (result) {
+          return result.text();
+        })
+        .then(function (message) {
+          alert(message);
+        })
+        .catch(console.error);
+    }
+  </script>
+</body>
+
 </html>

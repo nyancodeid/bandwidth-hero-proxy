@@ -6,7 +6,6 @@ import express from "express";
 import csrf from "csurf";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
-// import compression from "compression";
 import bodyParser from "body-parser";
 
 import { middleware as initializeDatabase } from "@src/config/rethink.js";
@@ -21,8 +20,26 @@ const app = express();
 
 app.disable("x-powered-by");
 
-// app.use(compression());
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "unpkg.com",
+          "v5.getbootstrap.com",
+        ],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "unpkg.com",
+          "v5.getbootstrap.com",
+        ],
+      },
+    },
+  })
+);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -41,13 +58,18 @@ app.get(
   compress.controller
 );
 
-app.get("/admin/users", [middleware.adminAuthenticate], admin.getAllUser);
+app.get(
+  "/admin/users",
+  [middleware.adminAuthenticate, csrfProtection],
+  admin.getAllUser
+);
 app.get(
   "/admin/user",
   [middleware.adminAuthenticate, csrfProtection],
   admin.createUserView
 );
-app.post("/admin/user", [csrfProtection], admin.createUser);
+app.post("/admin/api/user", [csrfProtection], admin.createUser);
+app.post("/admin/api/token", [csrfProtection], admin.regenerateUserToken);
 
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 

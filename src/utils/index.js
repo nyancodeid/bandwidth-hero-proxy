@@ -108,7 +108,7 @@ export const compress = (req, res, buffer) => {
       signale.info(
         `[${host.hostname}]${
           req.params.grayscale ? "[BW]" : ""
-        } Compression successfuly CHANGE:[${chalk.yellow(
+        } Compression successfully CHANGE:[${chalk.yellow(
           prettyByte(req.params.originSize)
         )} -> ${chalk.yellow(prettyByte(info.size))}] SAVE:[${chalk.green(
           prettyByte(saved)

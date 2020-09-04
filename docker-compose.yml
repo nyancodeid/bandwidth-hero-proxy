@@ -5,6 +5,7 @@ services:
     image: rethinkdb:latest
     ports:
       - 28015:28015
-      - 8080:8080
+      - 28016:8080
     volumes:
       - /data:/data
+    command: rethinkdb --bind all --bind-http all --initial-password ${RETHINKDB_PASSWD}

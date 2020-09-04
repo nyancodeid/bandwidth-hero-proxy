@@ -5,16 +5,16 @@
 
 import bcrypt from "bcrypt";
 import prettyByte from "pretty-bytes";
-import md5 from "md5";
 
 import { signale } from "@src/config/signale.js";
 import { client as r } from "@src/config/rethink.js";
+import { generateToken } from "@src/utils/admin.js";
 
 const BCRYPT_SALT_ROUNDS = 10;
 
 /**
  * Get all registered users
- * @controller
+ * @view
  * @param {Request} req
  * @param {Response} res
  */
@@ -33,9 +33,9 @@ export const getAllUser = async (req, res) => {
         email: user.email,
         token: user.token,
         stat: {
-          processed: user.processed,
-          bypassed: user.bypassed,
-          compressed: user.compressed,
+          processed: Number(user.processed).toLocaleString(),
+          bypassed: Number(user.bypassed).toLocaleString(),
+          compressed: Number(user.compressed).toLocaleString(),
           byteTotal: prettyByte(parseInt(user.byteTotal)),
           byteSaveTotal: prettyByte(parseInt(user.byteSaveTotal)),
           percentage: (
@@ -46,11 +46,12 @@ export const getAllUser = async (req, res) => {
           ).toFixed(0),
         },
         createdAt: user.createdAt,
+        regeneratedTokenAt: user.createdAt,
         lastLoginAt: user.lastLoginAt,
       };
     });
 
-    res.render("users", { users });
+    res.render("users", { users, csrfToken: req.csrfToken() });
   } catch (err) {
     res.status(500).send("Internal Server Error");
     signale.error(err);
@@ -59,7 +60,7 @@ export const getAllUser = async (req, res) => {
 
 /**
  * Create user view form
- * @controller
+ * @view
  * @param {Request} req
  * @param {Response} res
  */
@@ -69,6 +70,7 @@ export const createUserView = (req, res) => {
 
 /**
  * Create user POST Handler
+ * @rest
  * @controller
  * @param {Request} req
  * @param {Response} res
@@ -83,8 +85,8 @@ export const createUser = async (req, res) => {
       username,
     })
     .run(req._connection);
-  const token = md5(`${username}:${email}`).toString();
 
+  const token = generateToken({ username, length: 6 });
   const availableUser = await user.toArray();
 
   if (availableUser.length > 0)
@@ -98,6 +100,7 @@ export const createUser = async (req, res) => {
       password: passwordHash,
       token,
       createdAt: r.now(),
+      regeneratedTokenAt: r.now(),
       lastLoginAt: r.now(),
     })
     .run(req._connection);
@@ -118,4 +121,31 @@ export const createUser = async (req, res) => {
     .run(req._connection);
 
   return res.status(201).send("Created");
+};
+
+/**
+ * Regenerate user token POST Handler
+ * @rest
+ * @controller
+ * @param {Request} req
+ * @param {Response} res
+ */
+export const regenerateUserToken = async (req, res) => {
+  const { username, email } = req.body;
+
+  const token = generateToken({ username, length: 6 });
+
+  await r
+    .table("users")
+    .filter({
+      username,
+      email,
+    })
+    .update({
+      token,
+      regeneratedTokenAt: r.now(),
+    })
+    .run(req._connection);
+
+  return res.status(200).send("Operation successful");
 };
