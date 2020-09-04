@@ -33,9 +33,9 @@ export const getAllUser = async (req, res) => {
         email: user.email,
         token: user.token,
         stat: {
-          processed: user.processed,
-          bypassed: user.bypassed,
-          compressed: user.compressed,
+          processed: Number(user.processed).toLocaleString(),
+          bypassed: Number(user.bypassed).toLocaleString(),
+          compressed: Number(user.compressed).toLocaleString(),
           byteTotal: prettyByte(parseInt(user.byteTotal)),
           byteSaveTotal: prettyByte(parseInt(user.byteSaveTotal)),
           percentage: (
