@@ -50,7 +50,7 @@ export const getAllUser = async (req, res) => {
       };
     });
 
-    res.render("users", { users });
+    res.render("users", { users, csrfToken: req.csrfToken() });
   } catch (err) {
     res.status(500).send("Internal Server Error");
     signale.error(err);
