@@ -14,7 +14,7 @@ const BCRYPT_SALT_ROUNDS = 10;
 
 /**
  * Get all registered users
- * @controller
+ * @view
  * @param {Request} req
  * @param {Response} res
  */
@@ -59,7 +59,7 @@ export const getAllUser = async (req, res) => {
 
 /**
  * Create user view form
- * @controller
+ * @view
  * @param {Request} req
  * @param {Response} res
  */
@@ -69,6 +69,7 @@ export const createUserView = (req, res) => {
 
 /**
  * Create user POST Handler
+ * @rest
  * @controller
  * @param {Request} req
  * @param {Response} res
