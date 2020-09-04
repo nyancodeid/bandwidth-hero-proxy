@@ -46,6 +46,7 @@ export const getAllUser = async (req, res) => {
           ).toFixed(0),
         },
         createdAt: user.createdAt,
+        regeneratedTokenAt: user.createdAt,
         lastLoginAt: user.lastLoginAt,
       };
     });
