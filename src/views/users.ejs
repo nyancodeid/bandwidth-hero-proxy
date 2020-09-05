@@ -8,11 +8,18 @@
 
   <title>Users</title>
 
-  <link rel="stylesheet" href="https://v5.getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css" />
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/notyf@3.9.0/notyf.min.css" />
+  <style>
+    .regenerate-token--wrapper:hover .regenerate-token--txt {
+      color: #0d6efd !important;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="">
+  <div id="app">
     <h3>Table of <strong>Users</strong></h3>
     <div class="table-responsive">
       <table class="table table-striped">
@@ -25,99 +32,125 @@
             <th scope="col">Total Byte Saved</th>
             <th scope="col">Percentage</th>
             <th scope="col">Created At</th>
-            <th scope="col">Regenerated Token At</th>
+            <th scope="col">Regenerate Token At</th>
             <th scope="col">Last Login At</th>
           </tr>
         </thead>
         <tbody>
-          <% users.forEach(function(user, index){ %>
-          <tr>
-            <td><%= index+1 %></td>
+          <tr v-for="(user, index) in users" :key="index">
+            <td>{{ index+1 }}</td>
             <td>
-              <%= user.username %>
+              {{ user.username }}
               <br>
-              <small class="d-inline-block text-muted"><%= user.email %></small>
+              <small class="d-inline-block text-muted">{{ user.email }}</small>
               <br>
-              <small class="d-inline-block text-muted"><%= user.token %></small>
-              <small class="regenerate-token--btn d-inline-block text-muted" style="cursor: pointer;"
-                data-user="<%= user.username %>:<%= user.email %>">
-                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-clockwise" fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
-                  <path
-                    d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
-                </svg>
-              </small>
+              <div class="regenerate-token--wrapper d-inline-block">
+                <small class="regenerate-token--txt d-inline-block text-muted">{{ user.token }}</small>
+                <small class="regenerate-token--btn d-inline-block text-muted" style="cursor: pointer;"
+                  @click="regenerateToken(user, index)">
+                  <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-clockwise" fill="currentColor"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                    <path
+                      d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+                  </svg>
+                </small>
+              </div>
             </td>
             <td>
-              <%= user.stat.processed %>
-              <small class="d-block text-muted">Compressed: <%= user.stat.compressed %></small>
-              <small class="d-block text-muted">Bypassed: <%= user.stat.bypassed %></small>
+              {{ user.stat.processed }}
+              <small class="d-block text-muted">Compressed: {{ user.stat.compressed }}</small>
+              <small class="d-block text-muted">Bypassed: {{ user.stat.bypassed }}</small>
             </td>
-            <td><%= user.stat.byteTotal %></td>
-            <td><%= user.stat.byteSaveTotal %></td>
-            <td><%= user.stat.percentage | 0 %>%</td>
-            <td class="update-time" data-date="<%= user.createdAt %>">
-              <%= user.createdAt %>
+            <td>{{ user.stat.byteTotal }}</td>
+            <td>{{ user.stat.byteSaveTotal }}</td>
+            <td>{{ user.stat.percentage }}%</td>
+            <td class="update-time">{{ (user.createdAt) | dateFormat }}
+              <small class="d-block text-muted">{{ (user.createdAt) | timeFormat }}</small>
             </td>
-            <td class="update-time" data-date="<%= user.regeneratedTokenAt %>">
-              <%= user.regeneratedTokenAt %>
+            <td class="update-time">{{ (user.regeneratedTokenAt) | dateFormat}}
+              <small class="d-block text-muted">{{ (user.regeneratedTokenAt) | timeFormat }}</small>
             </td>
-            <td class="update-time" data-date="<%= user.lastLoginAt %>">
-              <%= user.lastLoginAt %>
+            <td class="update-time">{{ (user.lastLoginAt) | dateFormat }}
+              <small class="d-block text-muted">{{ (user.lastLoginAt) | timeFormat }}</small>
             </td>
           </tr>
-          <% }); %>
         </tbody>
       </table>
     </div>
   </div>
 
-  <script src="https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://v5.getbootstrap.com/docs/5.0/dist/js/bootstrap.min.js"></script>
+  <script async src="https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script async src="https://unpkg.com/notyf@3.9.0/notyf.min.js"></script>
+  <script src="https://unpkg.com/bootstrap@5.0.0-alpha1/dist/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/vue@2.6.12/dist/vue.min.js"></script>
   <script>
-    const elements = document.querySelectorAll(".update-time");
-    const regenerateTokenButtons = document.querySelectorAll(".regenerate-token--btn");
+    const users = "<%- users %>";
     const token = document
       .querySelector('meta[name="csrf-token"]')
       .getAttribute("content");
 
-    elements.forEach(function (element) {
-      const date = new Date(element.getAttribute("data-date"));
-
-      element.innerHTML = (date.toLocaleDateString() + " " + date.toLocaleTimeString());
-    });
-
-    regenerateTokenButtons.forEach(function (element) {
-      element.addEventListener("click", regenerateToken);
-    });
-
-    function regenerateToken() {
-      let user = this.getAttribute("data-user");
-      user = user.split(":");
-
-      const [username, email] = user;
-
-      fetch("/admin/api/token", {
-          credentials: "same-origin",
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "CSRF-Token": token,
-          },
-          body: JSON.stringify({
+    const app = new Vue({
+      el: '#app',
+      data: {
+        users: JSON.parse(atob(users))
+      },
+      filters: {
+        dateFormat(dateString) {
+          const date = new Date(dateString);
+          return date.toLocaleDateString()
+        },
+        timeFormat(dateString) {
+          const date = new Date(dateString);
+          return date.toLocaleTimeString();
+        }
+      },
+      methods: {
+        async regenerateToken(user, index) {
+          const {
             username,
-            email,
-          }),
-        })
-        .then(function (result) {
-          return result.text();
-        })
-        .then(function (message) {
-          alert(message);
-          window.location.reload();
-        })
-        .catch(console.error);
+            email
+          } = user;
+
+          try {
+            const result = await fetch("/admin/api/token", {
+              credentials: "same-origin",
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "CSRF-Token": token,
+              },
+              body: JSON.stringify({
+                username,
+                email,
+              }),
+            }).then(res => res.json())
+
+            notyf().success(result.message);
+
+            this.$set(this.users, index, {
+              ...user,
+              token: result.token
+            })
+          } catch (error) {
+            console.error(error)
+            notyf().error("Operation failed");
+          }
+        }
+      }
+    });
+
+    function notyf() {
+      if (!window._notyf) {
+        window._notyf = new Notyf({
+          position: {
+            x: "center",
+            y: "bottom"
+          }
+        });
+      }
+
+      return window._notyf;
     }
   </script>
 </body>

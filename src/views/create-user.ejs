@@ -7,67 +7,100 @@
   <meta name="csrf-token" content="<%= csrfToken %>" />
 
   <title>Create User</title>
-  <link rel="stylesheet" href="https://v5.getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css" />
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/notyf@3.9.0/notyf.min.css" />
 </head>
 
 <body>
-  <div class="container">
+  <div id="app" class="container">
     <h3>Create User</h3>
-    <form id="userForm">
+    <form id="userForm" v-on:submit.prevent="createUser">
       <div class="mb-3">
         <label for="input-username" class="form-label">Username</label>
-        <input type="text" class="form-control" id="input-username" name="username" />
+        <input type="text" class="form-control" id="input-username" name="username" required v-model="username" />
       </div>
       <div class="mb-3">
         <label for="input-email" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="input-email" name="email" aria-describedby="emailHelp" />
+        <input type="email" class="form-control" id="input-email" name="email" required aria-describedby="emailHelp"
+          v-model="email" />
         <div id="emailHelp" class="form-text">
           We'll never share your email with anyone else.
         </div>
       </div>
       <div class="mb-3">
         <label for="input-password" class="form-label">Password</label>
-        <input type="password" class="form-control" id="input-password" name="password" />
+        <input type="password" class="form-control" id="input-password" required name="password" v-model="password" />
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   </div>
 
-  <script src="https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://v5.getbootstrap.com/docs/5.0/dist/js/bootstrap.min.js"></script>
+  <script async src="https://unpkg.com/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script async src="https://unpkg.com/notyf@3.9.0/notyf.min.js"></script>
+  <script src="https://unpkg.com/bootstrap@5.0.0-alpha1/dist/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/vue@2.6.12/dist/vue.min.js"></script>
 
   <script>
-    document
-      .getElementById("userForm")
-      .addEventListener("submit", onFormSubmited, false);
+    const token = document
+      .querySelector('meta[name="csrf-token"]')
+      .getAttribute("content");
 
-    function onFormSubmited(event) {
-      event.preventDefault();
+    const app = new Vue({
+      el: "#app",
+      data: {
+        username: "",
+        email: "",
+        password: ""
+      },
+      methods: {
+        async createUser() {
+          this.$notyf = notyf();
 
-      const token = document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute("content");
+          if (this.username === "" || this.email === "" || this.password === "") {
+            return this.$notyf.error("Please fill all the field");
+          }
 
-      fetch("/admin/api/user", {
-          credentials: "same-origin",
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "CSRF-Token": token,
-          },
-          body: JSON.stringify({
-            username: userForm.username.value,
-            email: userForm.email.value,
-            password: userForm.password.value,
-          }),
-        })
-        .then(function (result) {
-          return result.text();
-        })
-        .then(function (message) {
-          alert(message);
-        })
-        .catch(console.error);
+          try {
+            const result = await fetch("/admin/api/user", {
+              credentials: "same-origin",
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "CSRF-Token": token,
+              },
+              body: JSON.stringify({
+                username: this.username,
+                email: this.email,
+                password: this.password,
+              }),
+            }).then(res => res.json())
+
+            if (result._s) {
+              this.$notyf.success(result.message);
+            } else {
+              this.$notyf.error(result.message);
+            }
+          } catch (error) {
+            console.error(error);
+
+            this.$notyf.error("Operation failed");
+          }
+        }
+      }
+    });
+
+    function notyf() {
+      if (!window._notyf) {
+        window._notyf = new Notyf({
+          position: {
+            x: "center",
+            y: "bottom"
+          }
+        });
+      }
+
+      return window._notyf;
     }
   </script>
 </body>

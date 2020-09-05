@@ -19,3 +19,9 @@
 - Add API Route POST: `admin/api/token`.
 - Fix typo.
 - Fix GZip compression problem behind nginx reserve proxy.
+
+## Version 2.2.1
+- update(docker): Make rethinkdb accessible only local
+- update(admin:controller): User list orderBy created date
+- update(admin:web): use VueJS
+- fix(typo): jsdoc params
