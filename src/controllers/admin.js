@@ -39,12 +39,13 @@ export const getAllUser = async (req, res) => {
           compressed: Number(user.compressed).toLocaleString(),
           byteTotal: prettyByte(parseInt(user.byteTotal)),
           byteSaveTotal: prettyByte(parseInt(user.byteSaveTotal)),
-          percentage: (
-            ((parseInt(user.byteSaveTotal) - parseInt(user.byteTotal)) /
-              parseInt(user.byteTotal)) *
-              100 +
-            100
-          ).toFixed(0),
+          percentage:
+            (
+              ((parseInt(user.byteSaveTotal) - parseInt(user.byteTotal)) /
+                parseInt(user.byteTotal)) *
+                100 +
+              100
+            ).toFixed(0) | 0,
         },
         createdAt: user.createdAt,
         regeneratedTokenAt: user.createdAt,
