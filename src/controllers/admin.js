@@ -24,6 +24,7 @@ export const getAllUser = async (req, res) => {
       .table("statistics")
       .eqJoin("user_id", r.table("users"))
       .zip()
+      .orderBy("createdAt")
       .run(req._connection)
       .then((res) => res.toArray());
 
