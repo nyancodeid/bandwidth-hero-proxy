@@ -33,7 +33,7 @@ export const copyHeaders = (source, res) => {
 
 /**
  *
- * @param {Request} request
+ * @param {Request} req
  * @return {Boolean}
  */
 export const shouldCompress = (req) => {
