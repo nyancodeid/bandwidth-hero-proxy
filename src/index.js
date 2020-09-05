@@ -18,18 +18,18 @@ import * as admin from "@src/controllers/admin.js";
 const SERVER_PORT = Env.use("PORT", 3060);
 
 const app = express();
+const csrfProtection = csrf({ cookie: true });
 
 app.disable("x-powered-by");
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-
 app.enable("trust proxy");
+
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
-const csrfProtection = csrf({ cookie: true });
-
+app.use(helmet(HELMET_CONFIGURATION_OPTIONS));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(initializeDatabase);
 
 app.get(
