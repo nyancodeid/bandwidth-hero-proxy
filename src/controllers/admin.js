@@ -53,7 +53,10 @@ export const getAllUser = async (req, res) => {
       };
     });
 
-    res.render("users", { users, csrfToken: req.csrfToken() });
+    res.render("users", {
+      users: Buffer.from(JSON.stringify(users)).toString("base64"),
+      csrfToken: req.csrfToken(),
+    });
   } catch (err) {
     res.status(500).send("Internal Server Error");
     signale.error(err);
@@ -92,7 +95,10 @@ export const createUser = async (req, res) => {
   const availableUser = await user.toArray();
 
   if (availableUser.length > 0)
-    return res.send(`user "${username}" already available!`);
+    return res.json({
+      _s: false,
+      message: `user "${username}" already available!`,
+    });
 
   const userInput = await r
     .table("users")
@@ -122,7 +128,10 @@ export const createUser = async (req, res) => {
     })
     .run(req._connection);
 
-  return res.status(201).send("Created");
+  return res.status(201).json({
+    _s: true,
+    message: "Created",
+  });
 };
 
 /**
@@ -149,5 +158,9 @@ export const regenerateUserToken = async (req, res) => {
     })
     .run(req._connection);
 
-  return res.status(200).send("Operation successful");
+  return res.status(200).json({
+    _s: true,
+    message: "Operation successful",
+    token,
+  });
 };
