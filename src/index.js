@@ -8,6 +8,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 
+import { HELMET_CONFIGURATION_OPTIONS } from "@src/config/app.js";
 import { middleware as initializeDatabase } from "@src/config/rethink.js";
 
 import * as middleware from "@src/middleware/index.js";
@@ -19,27 +20,6 @@ const SERVER_PORT = Env.use("PORT", 3060);
 const app = express();
 
 app.disable("x-powered-by");
-
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: [
-          "'self'",
-          "'unsafe-inline'",
-          "unpkg.com",
-          "v5.getbootstrap.com",
-        ],
-        scriptSrc: [
-          "'self'",
-          "'unsafe-inline'",
-          "unpkg.com",
-          "v5.getbootstrap.com",
-        ],
-      },
-    },
-  })
-);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
