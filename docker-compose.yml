@@ -4,7 +4,7 @@ services:
   rethinkdb:
     image: rethinkdb:latest
     ports:
-      - 28015:28015
+      - 127.0.0.1:28015:28015
       - 127.0.0.1:28016:8080
     volumes:
       - /data:/data
