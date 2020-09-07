@@ -19,6 +19,7 @@ const SERVER_PORT = Env.use("PORT", 3060);
 
 const app = express();
 const csrfProtection = csrf({ cookie: true });
+const helmetProtection = helmet(HELMET_CONFIGURATION_OPTIONS);
 
 app.disable("x-powered-by");
 app.enable("trust proxy");
@@ -26,7 +27,6 @@ app.enable("trust proxy");
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
-app.use(helmet(HELMET_CONFIGURATION_OPTIONS));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -40,16 +40,24 @@ app.get(
 
 app.get(
   "/admin/users",
-  [middleware.adminAuthenticate, csrfProtection],
+  [middleware.adminAuthenticate, csrfProtection, helmetProtection],
   admin.getAllUser
 );
 app.get(
   "/admin/user",
-  [middleware.adminAuthenticate, csrfProtection],
+  [middleware.adminAuthenticate, csrfProtection, helmetProtection],
   admin.createUserView
 );
-app.post("/admin/api/user", [csrfProtection], admin.createUser);
-app.post("/admin/api/token", [csrfProtection], admin.regenerateUserToken);
+app.post(
+  "/admin/api/user",
+  [csrfProtection, helmetProtection],
+  admin.createUser
+);
+app.post(
+  "/admin/api/token",
+  [csrfProtection, helmetProtection],
+  admin.regenerateUserToken
+);
 
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
