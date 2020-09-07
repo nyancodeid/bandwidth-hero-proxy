@@ -25,3 +25,6 @@
 - update(admin:controller): User list orderBy created date
 - update(admin:web): use VueJS
 - fix(typo): jsdoc params
+
+## Version v2.2.2
+- update(express): move helmet from top-level middleware into admin route only
