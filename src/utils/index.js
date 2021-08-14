@@ -257,8 +257,6 @@ export const redirect = (req, res) => {
 
   if (res.headersSent) return;
 
-  signale.info(`[${host.hostname}] Redirected passed`);
-
   storeBypassedSite(md5(req.params.url)).catch(() => {
     signale.error(`[BYPS#ERR][STATE][${hash}] Error while update state`);
   });
