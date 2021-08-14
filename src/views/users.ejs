@@ -62,17 +62,17 @@
               <small class="d-block text-muted">Compressed: {{ user.stat.compressed }}</small>
               <small class="d-block text-muted">Bypassed: {{ user.stat.bypassed }}</small>
             </td>
-            <td>{{ user.stat.byteTotal }}</td>
-            <td>{{ user.stat.byteSaveTotal }}</td>
+            <td>{{ user.stat.byte_total }}</td>
+            <td>{{ user.stat.byte_save_total }}</td>
             <td>{{ user.stat.percentage }}%</td>
-            <td class="update-time">{{ (user.createdAt) | dateFormat }}
-              <small class="d-block text-muted">{{ (user.createdAt) | timeFormat }}</small>
+            <td class="update-time">{{ (user.created_at) | dateFormat }}
+              <small class="d-block text-muted">{{ (user.created_at) | timeFormat }}</small>
             </td>
-            <td class="update-time">{{ (user.regeneratedTokenAt) | dateFormat}}
-              <small class="d-block text-muted">{{ (user.regeneratedTokenAt) | timeFormat }}</small>
+            <td class="update-time">{{ (user.updated_at) | dateFormat}}
+              <small class="d-block text-muted">{{ (user.updated_at) | timeFormat }}</small>
             </td>
-            <td class="update-time">{{ (user.lastLoginAt) | dateFormat }}
-              <small class="d-block text-muted">{{ (user.lastLoginAt) | timeFormat }}</small>
+            <td class="update-time">{{ (user.last_login_at) | dateFormat }}
+              <small class="d-block text-muted">{{ (user.last_login_at) | timeFormat }}</small>
             </td>
           </tr>
         </tbody>
