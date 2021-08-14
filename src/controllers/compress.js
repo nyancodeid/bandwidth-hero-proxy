@@ -28,11 +28,7 @@ export const controller = async (req, res) => {
 
   const { action, data } = await fetchImage(req);
 
-  if (action === "REDIRECT") {
-    await storeBypassedSite(hash);
-
-    return redirect(req, res);
-  }
+  if (action === "REDIRECT") return redirect(req, res);
 
   copyHeaders(data.origin, res);
 

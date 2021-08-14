@@ -102,7 +102,6 @@ export const shouldCompress = (req) => {
 export const compress = (req, res, buffer) => {
   const format = req.params.webp ? "webp" : "jpeg";
   const host = new URL(req.params.url);
-  const hash = md5(req.params.url);
 
   const options = {
     webp: {
@@ -128,13 +127,7 @@ export const compress = (req, res, buffer) => {
       resolveWithObject: true,
     })
     .then(({ data: output, info }) => {
-      if (!info || res.headersSent) {
-        storeBypassedSite(hash).catch(() => {
-          signale.error(`[BYPS#ERR][STATE][${hash}] Error while update state`);
-        });
-
-        return redirect(req, res);
-      }
+      if (!info || res.headersSent) return redirect(req, res);
 
       const saved = req.params.originSize - info.size;
       const percentage =
@@ -209,6 +202,10 @@ export const bypass = (req, res, buffer) => {
     signale.error(error);
   });
 
+  storeBypassedSite(md5(req.params.url)).catch(() => {
+    signale.error(`[BYPS#ERR][STATE][${hash}] Error while update state`);
+  });
+
   res.setHeader("x-proxy-bypass", 1);
   res.setHeader("content-length", buffer.length);
   res.status(200);
@@ -256,7 +253,15 @@ export const incrementState = async ({ userId, byte, saveByte, status }) => {
  * @param {Response} res
  */
 export const redirect = (req, res) => {
+  const host = new URL(req.params.url);
+
   if (res.headersSent) return;
+
+  signale.info(`[${host.hostname}] Redirected passed`);
+
+  storeBypassedSite(md5(req.params.url)).catch(() => {
+    signale.error(`[BYPS#ERR][STATE][${hash}] Error while update state`);
+  });
 
   res.setHeader("content-length", 0);
   res.removeHeader("cache-control");
