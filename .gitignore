@@ -4,3 +4,4 @@ build/
 coverage/
 .env
 __rest__/.env
+__db__/database.dev.sqlite3
