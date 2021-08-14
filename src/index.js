@@ -36,26 +36,17 @@ app.get(
   compress.controller
 );
 
-app.get(
-  "/admin/users",
-  [middleware.adminAuthenticate, csrfProtection, helmetProtection],
-  admin.getAllUser
-);
-app.get(
-  "/admin/user",
-  [middleware.adminAuthenticate, csrfProtection, helmetProtection],
-  admin.createUserView
-);
-app.post(
-  "/admin/api/user",
-  [csrfProtection, helmetProtection],
-  admin.createUser
-);
-app.post(
-  "/admin/api/token",
-  [csrfProtection, helmetProtection],
-  admin.regenerateUserToken
-);
+const adminWebMiddleware = [
+  middleware.adminAuthenticate,
+  csrfProtection,
+  helmetProtection,
+];
+const adminApiMiddleware = [csrfProtection, helmetProtection];
+
+app.get("/admin/users", adminWebMiddleware, admin.getAllUser);
+app.get("/admin/user", adminWebMiddleware, admin.createUserView);
+app.post("/admin/api/user", adminApiMiddleware, admin.createUser);
+app.post("/admin/api/token", adminApiMiddleware, admin.regenerateUserToken);
 
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
