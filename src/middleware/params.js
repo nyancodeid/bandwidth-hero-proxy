@@ -5,7 +5,7 @@
  */
 
 import Env from "@src/config/env.js";
-import { client as r } from "@src/config/rethink.js";
+import { updateUserLastLogin } from "@src/services/database";
 
 /**
  * @middleware
@@ -24,11 +24,7 @@ export const params = async (req, res, next) => {
    * return string "bandwidth-hero-proxy".
    */
   if (!url) {
-    await r
-      .table("users")
-      .get(req.userId)
-      .update({ lastLoginAt: r.now() })
-      .run(req._connection);
+    await updateUserLastLogin(req.userId);
 
     return res.end("bandwidth-hero-proxy");
   }

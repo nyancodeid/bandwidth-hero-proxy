@@ -9,7 +9,6 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 
 import { HELMET_CONFIGURATION_OPTIONS } from "@src/config/app.js";
-import { middleware as initializeDatabase } from "@src/config/rethink.js";
 
 import * as middleware from "@src/middleware/index.js";
 import * as compress from "@src/controllers/compress.js";
@@ -30,7 +29,6 @@ app.set("view engine", "ejs");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(initializeDatabase);
 
 app.get(
   "/s/:username/:token",
@@ -38,26 +36,17 @@ app.get(
   compress.controller
 );
 
-app.get(
-  "/admin/users",
-  [middleware.adminAuthenticate, csrfProtection, helmetProtection],
-  admin.getAllUser
-);
-app.get(
-  "/admin/user",
-  [middleware.adminAuthenticate, csrfProtection, helmetProtection],
-  admin.createUserView
-);
-app.post(
-  "/admin/api/user",
-  [csrfProtection, helmetProtection],
-  admin.createUser
-);
-app.post(
-  "/admin/api/token",
-  [csrfProtection, helmetProtection],
-  admin.regenerateUserToken
-);
+const adminWebMiddleware = [
+  middleware.adminAuthenticate,
+  csrfProtection,
+  helmetProtection,
+];
+const adminApiMiddleware = [csrfProtection, helmetProtection];
+
+app.get("/admin/users", adminWebMiddleware, admin.getAllUser);
+app.get("/admin/user", adminWebMiddleware, admin.createUserView);
+app.post("/admin/api/user", adminApiMiddleware, admin.createUser);
+app.post("/admin/api/token", adminApiMiddleware, admin.regenerateUserToken);
 
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
