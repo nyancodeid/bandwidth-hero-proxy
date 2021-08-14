@@ -1,20 +1,55 @@
 /**
  * @typedef {import('express').Request} Request
  * @typedef {import('express').Response} Response
- * @typedef {import('rethinkdb').Connection} RConnection
  */
 
 import sharp from "sharp";
 import prettyByte from "pretty-bytes";
 import chalk from "chalk";
-import { client as r } from "@src/config/rethink.js";
+import request from "request";
+import pick from "lodash/pick";
 
-import { signale } from "@src/config/signale.js";
 import Env from "@src/config/env.js";
+import { signale } from "@src/config/signale.js";
+import {
+  findStatistics,
+  storeBypassedSite,
+  updateStatisticById,
+} from "@src/services/database.js";
 import { WHITELIST_EXTENSION } from "@src/config/app.js";
+import md5 from "md5";
 
 const MIN_COMPRESS_LENGTH = Env.use("APP_MIN_COMPRESS_LENGTH");
 const MIN_TRANSPARENT_COMPRESS_LENGTH = MIN_COMPRESS_LENGTH * 100;
+
+export const fetchImage = (req) => {
+  return new Promise((resolve) => {
+    request.get(
+      req.params.url,
+      {
+        headers: {
+          ...pick(req.headers, ["cookie", "dnt", "referer"]),
+          "user-agent": "Bandwidth-Hero Compressor",
+          "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
+          via: "1.1 bandwidth-hero",
+        },
+        timeout: 10000,
+        maxRedirects: 5,
+        encoding: null,
+        strictSSL: false,
+        gzip: true,
+        jar: true,
+      },
+      (err, origin, buffer) => {
+        if (err || origin.statusCode >= 400) {
+          return resolve({ action: "REDIRECT", data: {} });
+        }
+
+        return resolve({ action: "NEXT", data: { origin, buffer } });
+      }
+    );
+  });
+};
 
 /**
  * @function
@@ -67,6 +102,7 @@ export const shouldCompress = (req) => {
 export const compress = (req, res, buffer) => {
   const format = req.params.webp ? "webp" : "jpeg";
   const host = new URL(req.params.url);
+  const hash = md5(req.params.url);
 
   const options = {
     webp: {
@@ -92,7 +128,13 @@ export const compress = (req, res, buffer) => {
       resolveWithObject: true,
     })
     .then(({ data: output, info }) => {
-      if (!info || res.headersSent) return redirect(req, res);
+      if (!info || res.headersSent) {
+        storeBypassedSite(hash).catch(() => {
+          signale.error(`[BYPS#ERR][STATE][${hash}] Error while update state`);
+        });
+
+        return redirect(req, res);
+      }
 
       const saved = req.params.originSize - info.size;
       const percentage =
@@ -117,15 +159,12 @@ export const compress = (req, res, buffer) => {
 
       const userId = req.userId;
 
-      incrementState(
-        {
-          userId,
-          byte: req.params.originSize,
-          saveByte: saved,
-          status: "compressed",
-        },
-        req._connection
-      ).catch((error) => {
+      incrementState({
+        userId,
+        byte: req.params.originSize,
+        saveByte: saved,
+        status: "compressed",
+      }).catch((error) => {
         signale.error(`[INC#ERR][STATE][${userId}] Error while update state`);
         signale.error(error);
       });
@@ -160,15 +199,12 @@ export const bypass = (req, res, buffer) => {
 
   const userId = req.userId;
 
-  incrementState(
-    {
-      userId,
-      byte: buffer.length,
-      saveByte: 0,
-      status: "bypass",
-    },
-    req._connection
-  ).catch((error) => {
+  incrementState({
+    userId,
+    byte: buffer.length,
+    saveByte: 0,
+    status: "bypass",
+  }).catch((error) => {
     signale.error(`[INC#ERR][STATE][${userId}] Error while update state`);
     signale.error(error);
   });
@@ -190,33 +226,25 @@ export const bypass = (req, res, buffer) => {
  * @param {RConnection} connection
  * @return {Promise}
  */
-export const incrementState = async (
-  { userId, byte, saveByte, status },
-  connection
-) => {
+export const incrementState = async ({ userId, byte, saveByte, status }) => {
   try {
-    const stat = await r
-      .table("statistics")
-      .filter({
-        user_id: userId,
-      })
-      .nth(0)
-      .default(null)
-      .run(connection);
+    const [error, stat] = await findStatistics({
+      user_id: userId,
+    });
 
-    if (!stat) return;
+    if (error) return;
 
     const update = {
       processed: stat.processed + 1,
       bypassed: status == "bypass" ? stat.bypassed + 1 : stat.bypassed,
       compressed:
         status == "compressed" ? stat.compressed + 1 : stat.compressed,
-      byteTotal: stat.byteTotal + byte,
-      byteSaveTotal: stat.byteSaveTotal + saveByte,
-      updatedAt: r.now(),
+      byte_total: stat.byte_total + byte,
+      byte_save_total: stat.byte_save_total + saveByte,
+      updated_at: Date.now(),
     };
 
-    return r.table("statistics").get(stat.id).update(update).run(connection);
+    return updateStatisticById(stat.id, update);
   } catch (error) {
     signale.error(error);
   }

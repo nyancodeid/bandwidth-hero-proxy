@@ -7,8 +7,13 @@ import bcrypt from "bcrypt";
 import prettyByte from "pretty-bytes";
 
 import { signale } from "@src/config/signale.js";
-import { client as r } from "@src/config/rethink.js";
 import { generateToken } from "@src/utils/admin.js";
+import {
+  createUser as createUserData,
+  isUsernameAvailable,
+  regenerateUserToken as regenerateUserTokenData,
+  getStatisticsWithUser,
+} from "@src/services/database.js";
 
 const BCRYPT_SALT_ROUNDS = 10;
 
@@ -20,13 +25,7 @@ const BCRYPT_SALT_ROUNDS = 10;
  */
 export const getAllUser = async (req, res) => {
   try {
-    const results = await r
-      .table("statistics")
-      .eqJoin("user_id", r.table("users"))
-      .zip()
-      .orderBy("createdAt")
-      .run(req._connection)
-      .then((res) => res.toArray());
+    const [error, results] = await getStatisticsWithUser();
 
     const users = results.map((user) => {
       return {
@@ -37,19 +36,19 @@ export const getAllUser = async (req, res) => {
           processed: Number(user.processed).toLocaleString(),
           bypassed: Number(user.bypassed).toLocaleString(),
           compressed: Number(user.compressed).toLocaleString(),
-          byteTotal: prettyByte(parseInt(user.byteTotal)),
-          byteSaveTotal: prettyByte(parseInt(user.byteSaveTotal)),
+          byte_total: prettyByte(parseInt(user.byte_total)),
+          byte_save_total: prettyByte(parseInt(user.byte_save_total)),
           percentage:
             (
-              ((parseInt(user.byteSaveTotal) - parseInt(user.byteTotal)) /
-                parseInt(user.byteTotal)) *
+              ((parseInt(user.byte_save_total) - parseInt(user.byte_total)) /
+                parseInt(user.byte_total)) *
                 100 +
               100
             ).toFixed(0) | 0,
         },
-        createdAt: user.createdAt,
-        regeneratedTokenAt: user.createdAt,
-        lastLoginAt: user.lastLoginAt,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+        last_login_at: user.last_login_at,
       };
     });
 
@@ -84,49 +83,25 @@ export const createUser = async (req, res) => {
   const { username, password, email } = req.body;
   const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
-  const user = await r
-    .table("users")
-    .filter({
-      username,
-    })
-    .run(req._connection);
+  const [_, isAvailable] = await isUsernameAvailable(username);
 
-  const token = generateToken({ username, length: 6 });
-  const availableUser = await user.toArray();
-
-  if (availableUser.length > 0)
+  if (isAvailable)
     return res.json({
       _s: false,
       message: `user "${username}" already available!`,
     });
 
-  const userInput = await r
-    .table("users")
-    .insert({
-      username,
-      email,
-      password: passwordHash,
-      token,
-      createdAt: r.now(),
-      regeneratedTokenAt: r.now(),
-      lastLoginAt: r.now(),
-    })
-    .run(req._connection);
+  const [error] = await createUserData({
+    username,
+    email,
+    password: passwordHash,
+  });
 
-  const [userId] = userInput.generated_keys;
-
-  await r
-    .table("statistics")
-    .insert({
-      user_id: userId,
-      processed: 0,
-      bypassed: 0,
-      compressed: 0,
-      byteTotal: 0,
-      byteSaveTotal: 0,
-      updatedAt: r.now(),
-    })
-    .run(req._connection);
+  if (error)
+    return res.status(500).json({
+      _s: false,
+      error,
+    });
 
   return res.status(201).json({
     _s: true,
@@ -146,17 +121,13 @@ export const regenerateUserToken = async (req, res) => {
 
   const token = generateToken({ username, length: 6 });
 
-  await r
-    .table("users")
-    .filter({
-      username,
-      email,
-    })
-    .update({
-      token,
-      regeneratedTokenAt: r.now(),
-    })
-    .run(req._connection);
+  const [error] = await regenerateUserTokenData({ username, email, token });
+
+  if (error)
+    return res.status(500).json({
+      _s: false,
+      error,
+    });
 
   return res.status(200).json({
     _s: true,

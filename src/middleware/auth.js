@@ -8,7 +8,7 @@ import auth from "basic-auth";
 
 import Env from "@src/config/env.js";
 import { accessDenied } from "@src/utils/index.js";
-import { client as r } from "@src/config/rethink.js";
+import { findUser } from "@src/services/database";
 
 /**
  * @middleware
@@ -21,20 +21,9 @@ export const authenticate = async (req, res, next) => {
 
   if (!username) return accessDenied(res, false);
 
-  const user = await r
-    .table("users")
-    .filter({
-      username,
-    })
-    .nth(0)
-    .default(null)
-    .run(req._connection);
+  const [error, user] = await findUser({ username, token });
 
-  if (!user) return accessDenied(res, false);
-
-  if (username !== user.username || token !== user.token) {
-    return accessDenied(res, false);
-  }
+  if (error || !user) return accessDenied(res, false);
 
   req.userId = user.id;
   req.user = user;

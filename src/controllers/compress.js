@@ -3,52 +3,43 @@
  * @typedef {import('express').Response} Response
  */
 
-import request from "request";
-import { pick } from "lodash";
-
+import { storeBypassedSite, isSiteBypassed } from "@src/services/database";
 import {
   redirect,
   copyHeaders,
   shouldCompress,
   bypass,
   compress,
+  fetchImage,
 } from "@src/utils/index.js";
+import md5 from "md5";
+import signale from "signale";
 
 /**
  * @function
  * @param {Request} req
  * @param {Response} res
  */
-export const controller = (req, res) => {
-  request.get(
-    req.params.url,
-    {
-      headers: {
-        ...pick(req.headers, ["cookie", "dnt", "referer"]),
-        "user-agent": "Bandwidth-Hero Compressor",
-        "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
-        via: "1.1 bandwidth-hero",
-      },
-      timeout: 10000,
-      maxRedirects: 5,
-      encoding: null,
-      strictSSL: false,
-      gzip: true,
-      jar: true,
-    },
-    (err, origin, buffer) => {
-      if (err || origin.statusCode >= 400) return redirect(req, res);
+export const controller = async (req, res) => {
+  const hash = md5(req.params.url);
+  const [error, isBypassed] = await isSiteBypassed(hash);
 
-      copyHeaders(origin, res);
+  if (error || isBypassed) return redirect(req, res);
 
-      req.params.originType = origin.headers["content-type"] || "";
-      req.params.originSize = buffer.length;
+  const { action, data } = await fetchImage(req);
 
-      if (!shouldCompress(req)) {
-        return bypass(req, res, buffer);
-      }
+  if (action === "REDIRECT") {
+    await storeBypassedSite(hash);
 
-      return compress(req, res, buffer);
-    }
-  );
+    return redirect(req, res);
+  }
+
+  copyHeaders(data.origin, res);
+
+  req.params.originType = data.origin.headers["content-type"] || "";
+  req.params.originSize = data.buffer.length;
+
+  if (!shouldCompress(req)) return bypass(req, res, data.buffer);
+
+  return compress(req, res, data.buffer);
 };

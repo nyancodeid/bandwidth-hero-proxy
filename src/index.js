@@ -9,7 +9,6 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 
 import { HELMET_CONFIGURATION_OPTIONS } from "@src/config/app.js";
-import { middleware as initializeDatabase } from "@src/config/rethink.js";
 
 import * as middleware from "@src/middleware/index.js";
 import * as compress from "@src/controllers/compress.js";
@@ -30,7 +29,6 @@ app.set("view engine", "ejs");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(initializeDatabase);
 
 app.get(
   "/s/:username/:token",
