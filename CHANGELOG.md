@@ -28,3 +28,13 @@
 
 ## Version v2.2.2
 - update(express): move helmet from top-level middleware into admin route only
+
+## Version v2.3.0
+- replace rethinkdb -> sqlite3
+- package(rethinkdb): remove
+- package(knex/sqlite3): install
+- update(config/rethinkdb): remove
+- new(config/sqlite): create configuration for knex sqlite driver
+- new(services/database): create database method helpers
+- update(database): use sqlite driver 
+- update(bypassed): log bypassed hash
