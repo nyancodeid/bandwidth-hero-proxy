@@ -23,11 +23,6 @@ low-resolution [WebP](https://developers.google.com/speed/webp/) or JPEG images.
    [WebP](https://developers.google.com/speed/webp/)/JPEG image.
 5. Compression service returns processed image to the browser
 
-### Heroku
-You can deploy this service to Heroku (untested for v2.3.0):
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/nyancodeid/bandwidth-hero-proxy)
-
 ## Privacy Consideration
 
 After installing the extension you need to setup data compression service.
