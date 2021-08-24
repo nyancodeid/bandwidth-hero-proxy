@@ -14,7 +14,7 @@ import * as middleware from "@src/middleware/index.js";
 import * as compress from "@src/controllers/compress.js";
 import * as admin from "@src/controllers/admin.js";
 
-const SERVER_PORT = Env.use("PORT", 3060);
+const SERVER_PORT = Env.use("PORT", 3000);
 
 const app = express();
 const csrfProtection = csrf({ cookie: true });

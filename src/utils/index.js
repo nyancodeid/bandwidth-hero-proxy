@@ -19,7 +19,7 @@ import {
 import { WHITELIST_EXTENSION } from "@src/config/app.js";
 import md5 from "md5";
 
-const MIN_COMPRESS_LENGTH = Env.use("APP_MIN_COMPRESS_LENGTH");
+const MIN_COMPRESS_LENGTH = Env.use("APP_MIN_COMPRESS_LENGTH", 1024);
 const MIN_TRANSPARENT_COMPRESS_LENGTH = MIN_COMPRESS_LENGTH * 100;
 
 export const fetchImage = (req) => {

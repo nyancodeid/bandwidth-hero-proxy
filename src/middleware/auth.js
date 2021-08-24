@@ -38,7 +38,7 @@ export const authenticate = async (req, res, next) => {
  * @param {NextFunction} next
  */
 export const adminAuthenticate = (req, res, next) => {
-  const adminCredential = Env.use("APP_KEY");
+  const adminCredential = Env.use("APP_KEY", "admin:admin");
   const [username, password] = adminCredential.split(":");
 
   const credentials = auth(req);
