@@ -4,7 +4,7 @@
   "description": "Bandwidth Hero Refactored by nyancodeid",
   "main": "index.js",
   "engines": {
-    "yarn": "1.x"
+    "npm": "7.x"
   },
   "scripts": {
     "start": "nodemon --exec babel-node ./src/index.js",
