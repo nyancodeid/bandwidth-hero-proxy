@@ -1,0 +1,21 @@
+{
+  "name": "ny-bandwidth-hero-proxy",
+  "description": "Data compression service that converts images to low-res WebP or JPEG on the fly. Used in Bandwidth-Hero browser extension. NyanCodeID Version",
+  "repository": "https://github.com/nyancodeid/bandwidth-hero-proxy",
+  "logo": "https://cloudflare-ipfs.com/ipfs/bafkreigpqs7x227obuvdcxlk65ghkqh3xw3rvaiemlmowlmkdzvzhatvkq",
+  "keywords": [
+    "proxy",
+    "compression",
+    "data saving",
+    "compress image",
+    "webp",
+    "nyandevid",
+    "nyancodeid"
+  ],
+  "env": {
+    "APP_KEY": {
+      "description": "Admin Page Credentials.",
+      "required": false
+    }
+  }
+}
