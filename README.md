@@ -33,6 +33,11 @@ for detailed instructions on how to run your own service.
 Once you have your own instance running, click "Configure data compression service" button under
 "Compression settings" in the extension popup.
 
+## Deploy to Heroku
+You can deploy this project to Heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/nyancodeid/bandwidth-hero-proxy)
+
 ## Installation
 First, make sure you have installed the Bandwidth hero extension in your browser of choice. If not, you can install it via the link below:
 
