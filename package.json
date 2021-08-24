@@ -3,6 +3,9 @@
   "version": "2.3.0",
   "description": "Bandwidth Hero Refactored by nyancodeid",
   "main": "index.js",
+  "engines": {
+    "yarn": "1.x"
+  },
   "scripts": {
     "start": "nodemon --exec babel-node ./src/index.js",
     "start:server": "npm run build && node ./build/index.js",
